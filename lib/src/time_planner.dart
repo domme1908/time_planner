@@ -187,7 +187,7 @@ class _TimePlannerState extends State<TimePlanner> {
                           Container(
                             height:
                                 (config.totalHours * config.cellHeight!) + 80,
-                            width: 1,
+                            width: 2,
                             color: style.dividerColor ??
                                 Theme.of(context).primaryColor,
                           ),
@@ -249,6 +249,7 @@ class _TimePlannerState extends State<TimePlanner> {
                                       ),
                                       const Divider(
                                         height: 1,
+                                        color: Colors.white,
                                       ),
                                     ],
                                   )
@@ -270,7 +271,7 @@ class _TimePlannerState extends State<TimePlanner> {
                                         height: (config.totalHours *
                                                 config.cellHeight!) +
                                             config.cellHeight!,
-                                        color: Colors.black12,
+                                        color: Colors.white,
                                       )
                                     ],
                                   )

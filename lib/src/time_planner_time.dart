@@ -19,7 +19,7 @@ class TimePlannerTime extends StatelessWidget {
       width: 60,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-        child: Center(child: Text(time!)),
+        child: Container(alignment: Alignment.topCenter, child: Text(time!)),
       ),
     );
   }
