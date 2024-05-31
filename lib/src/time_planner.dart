@@ -50,6 +50,9 @@ class _TimePlannerState extends State<TimePlanner> {
   TimePlannerStyle style = TimePlannerStyle();
   List<TimePlannerTask> tasks = [];
   bool? isAnimated = true;
+  bool _syncingMainToDay = false;
+  bool _syncingDayToMain = false;
+  bool _syncingMainToTime = false;
 
   /// check input value rules
   void _checkInputValue() {
@@ -95,6 +98,10 @@ class _TimePlannerState extends State<TimePlanner> {
   void initState() {
     _initData();
     super.initState();
+    mainHorizontalController.addListener(syncMainToDay);
+    dayHorizontalController.addListener(syncDayToMain);
+    mainVerticalController.addListener(syncMainToTime);
+
     Future.delayed(Duration.zero).then((_) {
       int hour = DateTime.now().hour;
       if (isAnimated != null && isAnimated == true) {
@@ -118,20 +125,44 @@ class _TimePlannerState extends State<TimePlanner> {
 
   @override
   void dispose() {
+    mainHorizontalController.removeListener(syncMainToDay);
+    dayHorizontalController.removeListener(syncDayToMain);
+    mainVerticalController.removeListener(syncMainToTime);
+
+    mainHorizontalController.dispose();
+    dayHorizontalController.dispose();
+    mainVerticalController.dispose();
+    timeVerticalController.dispose();
+
     super.dispose();
+  }
+
+  void syncMainToDay() {
+    if (!_syncingDayToMain) {
+      _syncingMainToDay = true;
+      dayHorizontalController.jumpTo(mainHorizontalController.offset);
+      _syncingMainToDay = false;
+    }
+  }
+
+  void syncDayToMain() {
+    if (!_syncingMainToDay) {
+      _syncingDayToMain = true;
+      mainHorizontalController.jumpTo(dayHorizontalController.offset);
+      _syncingDayToMain = false;
+    }
+  }
+
+  void syncMainToTime() {
+    if (!_syncingMainToTime) {
+      _syncingMainToTime = true;
+      timeVerticalController.jumpTo(mainVerticalController.offset);
+      _syncingMainToTime = false;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    mainHorizontalController.addListener(() {
-      dayHorizontalController.jumpTo(mainHorizontalController.offset);
-    });
-    dayHorizontalController.addListener(() {
-      mainHorizontalController.jumpTo(dayHorizontalController.offset);
-    });
-    mainVerticalController.addListener(() {
-      timeVerticalController.jumpTo(mainVerticalController.offset);
-    });
     return GestureDetector(
       child: Container(
         color: style.backgroundColor,
@@ -223,24 +254,66 @@ class _TimePlannerState extends State<TimePlanner> {
             controller: mainHorizontalController,
             scrollDirection: Axis.horizontal,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                for (int hour = widget.startHour;
-                    hour <= widget.endHour;
-                    hour++)
-                  Row(
-                    children: List.generate(
-                      config.totalDays,
-                      (index) => Container(
-                        width: config.cellWidth?.toDouble(),
-                        height: config.cellHeight?.toDouble(),
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child: Text('Task for $hour'), // Example placeholder
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    SizedBox(
+                      height: (config.totalHours * config.cellHeight!) + 80,
+                      width: (config.totalDays * config.cellWidth!).toDouble(),
+                      child: Stack(
+                        children: <Widget>[
+                          Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              for (var i = 0; i < config.totalHours; i++)
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      height:
+                                          (config.cellHeight! - 1).toDouble(),
+                                    ),
+                                    const Divider(
+                                      height: 1,
+                                      color: Colors.white,
+                                    ),
+                                  ],
+                                )
+                            ],
+                          ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              for (var i = 0; i < config.totalDays; i++)
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    SizedBox(
+                                      width: (config.cellWidth! - 1).toDouble(),
+                                    ),
+                                    Container(
+                                      width: 1,
+                                      height: (config.totalHours *
+                                              config.cellHeight!) +
+                                          config.cellHeight!,
+                                      color: Colors.white,
+                                    )
+                                  ],
+                                )
+                            ],
+                          ),
+                          for (int i = 0; i < tasks.length; i++) tasks[i],
+                        ],
                       ),
                     ),
-                  ),
+                  ],
+                ),
               ],
             ),
           ),
