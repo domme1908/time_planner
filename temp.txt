@@ -122,72 +122,90 @@ class _TimePlannerState extends State<TimePlanner> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return GestureDetector(
-    child: Container(
-      color: style.backgroundColor,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          SingleChildScrollView(
-            controller: mainHorizontalController,
-            scrollDirection: Axis.horizontal,
-            physics: const ClampingScrollPhysics(), // Optional, for better scroll feel
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                const SizedBox(width: 60),
-                for (int i = 0; i < config.totalDays; i++) widget.headers[i],
-              ],
-            ),
-          ),
-          Container(
-            height: 1,
-            color: style.dividerColor ?? Theme.of(context).primaryColor,
-          ),
-          Expanded(
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                ScrollConfiguration(
-                  behavior: ScrollConfiguration.of(context).copyWith(scrollbars: false),
-                  child: SingleChildScrollView(
-                    physics: const NeverScrollableScrollPhysics(),
-                    controller: timeVerticalController, // Vertical scrolling for time column
-                    child: buildTimeColumn(), // Build your time column here
+  Widget build(BuildContext context) {
+    mainHorizontalController.addListener(() {
+      dayHorizontalController.jumpTo(mainHorizontalController.offset);
+    });
+    mainVerticalController.addListener(() {
+      timeVerticalController.jumpTo(mainVerticalController.offset);
+    });
+    return GestureDetector(
+      child: Container(
+        color: style.backgroundColor,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            SingleChildScrollView(
+              controller: dayHorizontalController,
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const SizedBox(
+                    width: 60,
                   ),
-                ),
-                Expanded(
-                  child: buildMainBody(), // Main body which also uses mainHorizontalController
-                ),
-              ],
+                  for (int i = 0; i < config.totalDays; i++) widget.headers[i],
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-  
-  Widget buildTimeColumn() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    mainAxisAlignment: MainAxisAlignment.start,
-    mainAxisSize: MainAxisSize.min,
-    children: <Widget>[
-      for (int i = widget.startHour; i <= widget.endHour; i++)
-        TimePlannerTime(
-          time: '$i:00',  // Displaying time in 'hour:00' format
+            Container(
+              height: 1,
+              color: style.dividerColor ?? Theme.of(context).primaryColor,
+            ),
+            Expanded(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  ScrollConfiguration(
+                    behavior: ScrollConfiguration.of(context)
+                        .copyWith(scrollbars: false),
+                    child: SingleChildScrollView(
+                      physics: const NeverScrollableScrollPhysics(),
+                      controller: timeVerticalController,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              //first number is start hour and second number is end hour
+                              for (int i = widget.startHour;
+                                  i <= widget.endHour;
+                                  i++)
+                                TimePlannerTime(
+                                  time: i.toString() + ':00',
+                                ),
+                            ],
+                          ),
+                          Container(
+                            height:
+                                (config.totalHours * config.cellHeight!) + 80,
+                            width: 2,
+                            color: style.dividerColor ??
+                                Theme.of(context).primaryColor,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: buildMainBody(),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-    ],
-  );
-}
-
+      ),
+    );
+  }
 
   Widget buildMainBody() {
     if (style.showScrollBar!) {
