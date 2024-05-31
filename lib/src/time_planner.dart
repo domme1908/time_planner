@@ -211,12 +211,12 @@ class _TimePlannerState extends State<TimePlanner> {
     if (style.showScrollBar!) {
       return Scrollbar(
         controller: mainVerticalController,
-        thumbVisibility: true,
+        thumbVisibility: false,
         child: SingleChildScrollView(
           controller: mainVerticalController,
           child: Scrollbar(
             controller: mainHorizontalController,
-            thumbVisibility: true,
+            thumbVisibility: false,
             child: SingleChildScrollView(
               controller: mainHorizontalController,
               scrollDirection: Axis.horizontal,
