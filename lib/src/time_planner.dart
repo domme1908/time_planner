@@ -140,7 +140,7 @@ class _TimePlannerState extends State<TimePlanner> {
             SingleChildScrollView(
               controller: dayHorizontalController,
               scrollDirection: Axis.horizontal,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: const ClampingScrollPhysics(),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -165,7 +165,7 @@ class _TimePlannerState extends State<TimePlanner> {
                     behavior: ScrollConfiguration.of(context)
                         .copyWith(scrollbars: false),
                     child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       controller: timeVerticalController,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
