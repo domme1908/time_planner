@@ -126,6 +126,9 @@ class _TimePlannerState extends State<TimePlanner> {
     mainHorizontalController.addListener(() {
       dayHorizontalController.jumpTo(mainHorizontalController.offset);
     });
+    dayHorizontalController.addListener(() {
+      mainHorizontalController.jumpTo(dayHorizontalController.offset);
+    });
     mainVerticalController.addListener(() {
       timeVerticalController.jumpTo(mainVerticalController.offset);
     });
@@ -208,153 +211,39 @@ class _TimePlannerState extends State<TimePlanner> {
   }
 
   Widget buildMainBody() {
-    if (style.showScrollBar!) {
-      return Scrollbar(
-        controller: mainVerticalController,
-        thumbVisibility: false,
-        child: SingleChildScrollView(
-          controller: mainVerticalController,
-          child: Scrollbar(
-            controller: mainHorizontalController,
-            thumbVisibility: false,
-            child: SingleChildScrollView(
-              controller: mainHorizontalController,
-              scrollDirection: Axis.horizontal,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                mainAxisAlignment: MainAxisAlignment.end,
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      SizedBox(
-                        height: (config.totalHours * config.cellHeight!) + 80,
-                        width:
-                            (config.totalDays * config.cellWidth!).toDouble(),
-                        child: Stack(
-                          children: <Widget>[
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                for (var i = 0; i < config.totalHours; i++)
-                                  Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      SizedBox(
-                                        height:
-                                            (config.cellHeight! - 1).toDouble(),
-                                      ),
-                                      const Divider(
-                                        height: 1,
-                                        color: Colors.white,
-                                      ),
-                                    ],
-                                  )
-                              ],
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                for (var i = 0; i < config.totalDays; i++)
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: <Widget>[
-                                      SizedBox(
-                                        width:
-                                            (config.cellWidth! - 1).toDouble(),
-                                      ),
-                                      Container(
-                                        width: 1,
-                                        height: (config.totalHours *
-                                                config.cellHeight!) +
-                                            config.cellHeight!,
-                                        color: Colors.white,
-                                      )
-                                    ],
-                                  )
-                              ],
-                            ),
-                            for (int i = 0; i < tasks.length; i++) tasks[i],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      );
-    }
-    return SingleChildScrollView(
+    return Scrollbar(
       controller: mainVerticalController,
+      thumbVisibility: true,
       child: SingleChildScrollView(
-        controller: mainHorizontalController,
-        scrollDirection: Axis.horizontal,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.end,
-              mainAxisSize: MainAxisSize.min,
+        controller: mainVerticalController,
+        child: Scrollbar(
+          controller: mainHorizontalController,
+          thumbVisibility: true,
+          child: SingleChildScrollView(
+            controller: mainHorizontalController,
+            scrollDirection: Axis.horizontal,
+            child: Column(
               children: <Widget>[
-                SizedBox(
-                  height: (config.totalHours * config.cellHeight!) + 80,
-                  width: (config.totalDays * config.cellWidth!).toDouble(),
-                  child: Stack(
-                    children: <Widget>[
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          for (var i = 0; i < config.totalHours; i++)
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                SizedBox(
-                                  height: (config.cellHeight! - 1).toDouble(),
-                                ),
-                                const Divider(
-                                  height: 1,
-                                ),
-                              ],
-                            )
-                        ],
+                for (int hour = widget.startHour;
+                    hour <= widget.endHour;
+                    hour++)
+                  Row(
+                    children: List.generate(
+                      config.totalDays,
+                      (index) => Container(
+                        width: config.cellWidth?.toDouble(),
+                        height: config.cellHeight?.toDouble(),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                        ),
+                        child: Text('Task for $hour'), // Example placeholder
                       ),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          for (var i = 0; i < config.totalDays; i++)
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                SizedBox(
-                                  width: (config.cellWidth! - 1).toDouble(),
-                                ),
-                                Container(
-                                  width: 1,
-                                  height:
-                                      (config.totalHours * config.cellHeight!) +
-                                          config.cellHeight!,
-                                  color: Colors.black12,
-                                )
-                              ],
-                            )
-                        ],
-                      ),
-                      for (int i = 0; i < tasks.length; i++) tasks[i],
-                    ],
+                    ),
                   ),
-                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );
